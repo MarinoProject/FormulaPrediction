@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Montserrat", sans-serif;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        background-color: #0b0d10;
+        padding-top: 39px; /* Space for the fixed nav */
+        box-sizing: border-box;
+      }
+      nav {
+        width: 100%;
+        background-color: #1e1e1e;
+        padding: 10px 0;
+        text-align: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      nav a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 18px;
+      }
+
+      nav a:hover {
+        color: #ccc;
+      }
+      .header {
+        height: 50px;
+      }
+      h1 {
+        color: white;
+        margin-bottom: 5px;
+        margin-left: 10%;
+      }
+      p {
+        color: white;
+        margin-bottom: 5px;
+        max-width: 800px;
+        margin-left: 10%;
+      }
+      .box-container {
+        display: flex;
+        margin-left: 10%;
+        margin-top: 30px;
+      }
+      .box {
+        border: 1.5px solid rgb(219, 219, 219);
+        border-radius: 5px;
+        height: 100px;
+        width: 100px;
+        margin-right: 20px;
+      }
+      .car {
+        float: right;
+        width: 70%;
+        margin-top: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="./">Home</a>
+      <a href="./gp">Grand Prix</a>
+      <a href="./lineup">Driver Lineup</a>
+    </nav>
+    <div class="header"></div>
+    <h1>Formula 1</h1>
+    <p>
+      As the highest class of international racing for single-seater formula
+      racing cars, Formula 1 is the pinnacle of motorsport and the world’s most
+      prestigious motor racing competition. There really is nothing like it.
+      It’s a team sport (it needs to be to change all 4 tyres on a car in under
+      2 seconds!), but the drivers are more like fighter pilots than
+      sportspeople. Battling extreme g-forces, making daring decisions in the
+      blink of an eye – and at 370km/h. To be the best, F1 drivers push
+      themselves – and their incredibly innovative machines – to the very limit.
+      Drivers compete for the esteemed F1 Drivers’ Championship, while the teams
+      fight for the F1 Constructors’ Championship and prize money based on their
+      position at the end of the season. Each race is known as a Grand Prix, and
+      they’re held in incredible locations around the world. 2024 will feature a
+      record-breaking number of Grand Prix events, with 24 races set to take
+      place this season.
+    </p>
+    <div class="box-container">
+      <a href="./gp"
+        ><div class="box"><img src="./images/2.png" width="100%" /></div
+      ></a>
+      <a href="./lineup"
+        ><div class="box"><img src="./images/1.png" width="100%" /></div
+      ></a>
+    </div>
+    <div>
+      <img src="./images/car.png" class="car" />
+    </div>
+  </body>
+</html>
