@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GP Prediction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        background-color: #121212;
+        padding-top: 39px;
+        box-sizing: border-box;
+      }
+      nav {
+        width: 100%;
+        background-color: #1e1e1e;
+        padding: 10px 0;
+        text-align: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      nav a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 18px;
+      }
+
+      nav a:hover {
+        color: #ccc;
+      }
+
+      .header {
+        text-align: center;
+        color: #fff;
+        margin-bottom: 10px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 715px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tier {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0px;
+        max-width: 700px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .tier-label {
+        width: 10%;
+        min-width: 50px;
+        min-height: 55px;
+        height: auto;
+        text-align: center;
+        background-color: #1e1e1e;
+        color: #fff;
+        border: 1px solid #333;
+        margin-right: 0px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 2px;
+        box-sizing: border-box;
+        margin-right: 1px;
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+      }
+
+      .tier-content {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        background-color: #333;
+        border-radius: 2px;
+        min-height: 55px;
+        height: auto;
+        border: 1px solid #444;
+        align-items: center;
+        box-sizing: border-box;
+        position: relative;
+        max-width: px;
+      }
+
+      .tier-items {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        align-items: flex-start;
+        height: 100%;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .item {
+        width: 85px;
+        height: 85px;
+        align-content: center;
+        border-radius: 2px;
+        cursor: grab;
+        box-sizing: border-box;
+        transition: width 0.3s ease;
+        margin: 0px;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .item-expanded {
+        width: 100% !important;
+      }
+
+      .item.dragging {
+        opacity: 0.5;
+      }
+
+      .tier-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+
+      .tier-controls button {
+        background: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 18px;
+        margin: 2px 0;
+        box-sizing: border-box;
+        pointer-events: auto;
+      }
+
+      .tier-extra-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-left: 2px;
+      }
+
+      .tier-extra-controls button {
+        background: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 18px;
+        margin: 2px 0;
+        box-sizing: border-box;
+      }
+
+      .items {
+        display: flex;
+        gap: 2px;
+        flex-wrap: wrap;
+        padding-top: 20px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .controls button {
+        margin: 0.5px;
+      }
+
+      .footer {
+        height: 300px;
+      }
+
+      .buttons-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .buttons-container button {
+        margin: 0 3px;
+        padding: 10px 20px;
+        background-color: none;
+        color: white;
+        background-color: #121212;
+        border: none;
+        cursor: pointer;
+        border: 1px solid;
+        border-radius: 3px;
+      }
+      #tier-label-1 {
+        border: 0px solid gold;
+        background: linear-gradient(145deg, #ffd700, #ffa500);
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.7),
+          0 0 20px rgba(255, 215, 0, 0.5);
+        color: white;
+        text-shadow: 0 0 5px gold, 0 0 10px gold;
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 700;
+        font-style: normal;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="gp.html">Grand Prix</a>
+      <a href="lineup.html">Driver Lineup</a>
+    </nav>
+    <div class="header">
+      <h1>Formula one</h1>
+      <h2><span contenteditable="true">...... GP Prediction</span></h2>
+    </div>
+    <div class="container" id="tier-container">
+      <div class="tier" id="tier-1">
+        <div class="tier-label" id="tier-label-1">1</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-2">
+        <div class="tier-label" id="tier-label-2">2</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-3">
+        <div class="tier-label" id="tier-label-3">3</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-4">
+        <div class="tier-label">4</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-5">
+        <div class="tier-label">5</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-6">
+        <div class="tier-label">6</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-7">
+        <div class="tier-label">7</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-8">
+        <div class="tier-label">8</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-9">
+        <div class="tier-label">9</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="tier" id="tier-10">
+        <div class="tier-label">10</div>
+        <div
+          class="tier-content"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <div class="tier-items"></div>
+          <div class="tier-controls"></div>
+        </div>
+        <div class="tier-extra-controls"></div>
+      </div>
+      <div class="items">
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(1\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(2\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(3\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(4\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(5\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(6\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(7\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(8\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(9\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(10\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(11\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(12\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(21\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(14\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(15\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(16\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(17\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(18\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(19\).png');
+          "
+        ></div>
+        <div
+          class="item"
+          draggable="true"
+          ondragstart="drag(event)"
+          style="
+            background-image: url('./images/driver_lineup_prediction\ \(20\).png');
+          "
+        ></div>
+      </div>
+      <div class="controls, buttons-container">
+        <button onclick="reloadPage()">Reset</button>
+        <button id="toggle-items-button" onclick="toggleItems()">
+          Hide Items
+        </button>
+      </div>
+    </div>
+    <div class="footer"></div>
+    <script>
+      const imageReplacementMap = {
+        "./images/driver_lineup_prediction\ \(1\).png": "db1.png",
+        "./images/driver_lineup_prediction\ \(2\).png": "db3.png",
+        "./images/driver_lineup_prediction\ \(3\).png": "db5.png",
+        "./images/driver_lineup_prediction\ \(4\).png": "db4.png",
+        "./images/driver_lineup_prediction\ \(5\).png": "db2.png",
+        "./images/driver_lineup_prediction\ \(6\).png": "db6.png",
+        "./images/driver_lineup_prediction\ \(7\).png": "db7.png",
+        "./images/driver_lineup_prediction\ \(8\).png": "db8.png",
+        "./images/driver_lineup_prediction\ \(9\).png": "db9.png",
+        "./images/driver_lineup_prediction\ \(10\).png": "db11.png",
+        "./images/driver_lineup_prediction\ \(11\).png": "db10.png",
+        "./images/driver_lineup_prediction\ \(12\).png": "db12.png",
+        "./images/driver_lineup_prediction\ \(21\).png": "db14.png",
+        "./images/driver_lineup_prediction\ \(14\).png": "db15.png",
+        "./images/driver_lineup_prediction\ \(15\).png": "db19.png",
+        "./images/driver_lineup_prediction\ \(16\).png": "db13.png",
+        "./images/driver_lineup_prediction\ \(17\).png": "db20.png",
+        "./images/driver_lineup_prediction\ \(18\).png": "db16.png",
+        "./images/driver_lineup_prediction\ \(19\).png": "db18.png",
+        "./images/driver_lineup_prediction\ \(20\).png": "db17.png",
+      };
+
+      function toggleItems() {
+        const itemsContainer = document.querySelector(".items");
+        const toggleButton = document.getElementById("toggle-items-button");
+
+        if (itemsContainer.style.display === "none") {
+          itemsContainer.style.display = "flex";
+          toggleButton.textContent = "Hide Items";
+        } else {
+          itemsContainer.style.display = "none";
+          toggleButton.textContent = "Reveal Items";
+        }
+      }
+
+      function reloadPage() {
+        location.reload();
+      }
+
+      function allowDrop(event) {
+        event.preventDefault();
+      }
+
+      function drag(event) {
+        event.dataTransfer.setData("text", event.target.id);
+        event.target.classList.add("dragging");
+      }
+
+      function drop(event) {
+        event.preventDefault();
+        const data = event.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+        const target = event.target.closest(".tier-content");
+        if (target) {
+          const tierItems = target.querySelector(".tier-items");
+          tierItems.appendChild(draggedElement);
+          draggedElement.classList.add("item-expanded");
+          draggedElement.classList.remove("dragging");
+
+          const currentImage = draggedElement.style.backgroundImage
+            .match(/url\(["']?([^"']*)["']?\)/)[1]
+            .split("/")
+            .pop();
+
+          const newImage = imageReplacementMap[currentImage];
+          if (newImage) {
+            draggedElement.style.backgroundImage = `url(${newImage})`;
+          }
+
+          updateHeights(target.closest(".tier"));
+
+          // Add event listener for item removal
+          draggedElement.addEventListener("dragstart", () => {
+            draggedElement.classList.add("dragging");
+          });
+
+          draggedElement.addEventListener("dragend", () => {
+            draggedElement.classList.remove("dragging");
+            updateHeights(target.closest(".tier"));
+          });
+        } else {
+          const itemsContainer = document.querySelector(".items");
+          itemsContainer.appendChild(draggedElement);
+          draggedElement.classList.remove("item-expanded");
+          draggedElement.classList.remove("dragging");
+
+          const originalImage = Object.keys(imageReplacementMap).find(
+            (key) =>
+              imageReplacementMap[key] ===
+              draggedElement.style.backgroundImage
+                .match(/url\(["']?([^"']*)["']?\)/)[1]
+                .split("/")
+                .pop()
+          );
+          if (originalImage) {
+            draggedElement.style.backgroundImage = `url(${originalImage})`;
+          }
+        }
+      }
+
+      function updateHeights(tier) {
+        const tierItems = tier.querySelector(".tier-items");
+        const itemCount = tierItems.children.length;
+        const newHeight = Math.max(55, 55 * itemCount);
+
+        const tierLabel = tier.querySelector(".tier-label");
+        const tierContent = tier.querySelector(".tier-content");
+
+        tierLabel.style.height = newHeight + "px";
+        tierContent.style.height = newHeight + "px";
+      }
+
+      document.querySelectorAll(".item").forEach((item, index) => {
+        item.id = "item-" + index;
+      });
+
+      document.querySelectorAll("[contenteditable]").forEach((element) => {
+        element.setAttribute("spellcheck", "false");
+      });
+    </script>
+  </body>
+</html>
